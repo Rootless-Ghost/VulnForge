@@ -20,9 +20,13 @@ To set up your development environment:
 pip install -r requirements.txt
 
 ```
-## Development Environment
+## Code Style
 
-To set up your development environment:
+Please follow PEP 8 guidelines for Python code. We recommend using flake8 to check your code before submitting:
 
 ```bash
-pip install -r requirements.txt
+# Install flake8
+pip install flake8
+
+# Run flake8 on the code
+flake8 exploit_finder.py
