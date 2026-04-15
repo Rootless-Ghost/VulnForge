@@ -38,113 +38,114 @@ VulnForge → HuntForge (hunt playbook) → AtomicLoop (simulation) → Wazuh (d
 - **Dark UI** — Nebula Forge dark theme, consistent with the full suite
 ---
 
+## Part of Nebula Forge
+ 
+VulnForge is part of [Nebula Forge](https://github.com/Rootless-Ghost/Nebula-Forge) — an open-source SOC platform covering the full detection engineering workflow.
+ 
+| Tool | Port | Role |
+|------|------|------|
+| LogNorm | 5006 | Log normalization (ECS-lite) |
+| HuntForge | 5007 | ATT&CK hunt playbook generation |
+| DriftWatch | 5008 | Sigma rule drift analysis |
+| ClusterIQ | 5009 | Alert clustering and triage |
+| AtomicLoop | 5011 | Atomic Red Team test runner |
+| **VulnForge** | **5012** | **Vulnerability & exploit intelligence** |
+ 
+---
+
 ## Installation
-
-1. Clone this repository:
+ 
+```bash
+git clone https://github.com/Rootless-Ghost/VulnForge.git
+cd VulnForge
+pip install -r requirements.txt
+python app.py
 ```
-git clone https://github.com/yourusername/automated-exploit-finder.git
-cd automated-exploit-finder
-```
-
-2. Install the required dependencies:
-```
-pip install requests beautifulsoup4 colorama tqdm
-```
-
-3. Make the script executable:
-```
-chmod +x exploit_finder.py
-```
+ 
+Access at `http://localhost:5012`
 
 ## Usage
-
-### Basic Usage
-
+ 
+### Web UI
+ 
+1. Enter a keyword (e.g. `apache 2.4`), CVE ID (e.g. `CVE-2021-44228`), or both
+2. Filter by exploit type and platform
+3. Select sources: ExploitDB, NVD, Metasploit
+4. Click **Search**
+5. From results, export to LogNorm, send to HuntForge, or trigger AtomicLoop
+### API
+ 
+**Search:**
+```bash
+curl -X POST http://localhost:5012/api/search \
+  -H "Content-Type: application/json" \
+  -d '{"keyword": "log4j", "cve": "CVE-2021-44228"}'
 ```
-python exploit_finder.py --keyword "apache 2.4" --type "rce" --output results.json
+ 
+**Export to LogNorm:**
+```bash
+curl -X POST http://localhost:5012/export/lognorm \
+  -H "Content-Type: application/json" \
+  -d '{"results": [...]}'
 ```
-
-### Search by CVE ID
-
+ 
+**Send to HuntForge:**
+```bash
+curl -X POST http://localhost:5012/export/huntforge \
+  -H "Content-Type: application/json" \
+  -d '{"technique_id": "T1190", "cve": "CVE-2021-44228"}'
 ```
-python exploit_finder.py --cve "CVE-2021-44228" --output log4shell_exploits.json
+ 
+**Health check:**
+```bash
+curl http://localhost:5012/health
 ```
+ 
+---
 
-### Search for Specific Platform Exploits
-
+## ATT&CK Mapping
+ 
+VulnForge maps CVEs to ATT&CK techniques using a chained lookup:
+ 
 ```
-python exploit_finder.py --keyword "wordpress" --platform "php" --output wordpress_exploits.csv --format csv
+CVE → NVD CWE tags → CAPEC → ATT&CK Technique
 ```
-
-### Search Only Specific Sources
-
+ 
+Results include technique ID, technique name, tactic, and confidence level (high/medium/low). When no mapping is found, `UNKNOWN` is returned rather than silently omitting the field.
+ 
+---
+ 
+## Export Formats
+ 
+### LogNorm NDJSON (ECS-lite)
+```json
+{
+  "event.kind": "vulnerability",
+  "cve.id": "CVE-2021-44228",
+  "vulnerability.score.base": 10.0,
+  "vulnerability.severity": "CRITICAL",
+  "threat.technique.id": "T1190",
+  "threat.technique.name": "Exploit Public-Facing Application",
+  "threat.tactic.name": "Initial Access",
+  "source.tool": "VulnForge",
+  "@timestamp": "2026-04-15T00:00:00Z"
+}
 ```
-python exploit_finder.py --keyword "windows" --exploitdb --metasploit
-```
+ 
+---
+ 
+## Requirements
+ 
+- Python 3.10+
+- `flask`, `requests`, `beautifulsoup4`, `mitreattack-python`
+- Metasploit Framework (optional — graceful fallback if not installed)
+- HuntForge on port 5007 (optional — offline-safe)
+- AtomicLoop on port 5011 (optional — offline-safe)
+---
 
-### Command Line Arguments
-
-| Argument | Short | Description |
-|----------|-------|-------------|
-| `--keyword` | `-k` | Keyword to search for (e.g., "apache 2.4") |
-| `--cve` | `-c` | Specific CVE ID to search for (e.g., "CVE-2021-44228") |
-| `--type` | `-t` | Type of exploit to search for (e.g., "rce", "sqli", "xss") |
-| `--platform` | `-p` | Platform to search for (e.g., "windows", "linux", "php") |
-| `--output` | `-o` | Output file name |
-| `--format` | `-f` | Output format (json or csv, default: json) |
-| `--exploitdb` | | Search only ExploitDB |
-| `--nvd` | | Search only NVD |
-| `--metasploit` | | Search only Metasploit |
-
-## Example Output
-
-```
-[*] Starting comprehensive search across all databases...
-[*] Search criteria: keyword='apache', type='rce', platform='None', cve='None'
-[*] Searching ExploitDB...
-[+] Found 15 exploits on ExploitDB
-[*] Searching NVD Database...
-[+] Found 23 vulnerabilities in NVD
-[*] Searching Metasploit Framework...
-[+] Found 7 exploits in Metasploit
-[+] Search complete. Found 45 total results
-
-=== Results Summary ===
-[*] ExploitDB: 15 results
-[*] NVD: 23 results
-[*] Metasploit: 7 results
-[+] Results exported to exploit_finder_results_20250324_120835.json
-
-=== Sample Results (showing first 5) ===
-
-Result #1 from ExploitDB
-  ID: 51095
-  Title: Apache HTTP Server 2.4.49 - Path Traversal & Remote Code Execution (RCE)
-  Date: 2022-04-08
-  URL: https://www.exploit-db.com/exploits/51095
-
-Result #2 from ExploitDB
-  ID: 50572
-  Title: Apache 2.4.49 - Path Traversal
-  Date: 2021-10-05
-  URL: https://www.exploit-db.com/exploits/50572
-
-...
-```
-
-## Responsible Usage
-
-This tool is intended for legitimate security testing and research purposes only. Always ensure you have proper authorization before testing for vulnerabilities on any system. Unauthorized testing may violate laws and regulations.
-
-## Acknowledgments
-
-- ExploitDB for maintaining a comprehensive exploit database
-- National Vulnerability Database (NVD) for providing CVE information
-- Metasploit Framework for providing a powerful exploitation framework
-
-## Disclaimer
-
-The authors of this tool are not responsible for any misuse or damage caused by this program. Use at your own risk.
+## Responsible Use
+ 
+VulnForge is intended for authorized security testing, detection engineering, and purple team operations. Do not use against systems you do not own or have explicit written permission to test.
 
 ## License
 
