@@ -131,6 +131,7 @@ class ExploitSearchEngine:
             params["keywordSearch"] = keyword
         if cve:
             params["cveId"] = cve.upper() if cve.upper().startswith("CVE-") else f"CVE-{cve.upper()}"
+        params["resultsPerPage"] = 20
 
         logger.info("NVD search params: %s", params)
 
