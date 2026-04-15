@@ -40,11 +40,11 @@ VulnForge → HuntForge (hunt playbook) → AtomicLoop (simulation) → Wazuh (d
 
 ## Screenshots
 
-![Search Results](docs/screenshots/search-results.png)
-*CVE search with MITRE ATT&CK mapping and CVSS scoring*
+![Dashboard](docs/screenshots/VulnForge-Dashboard.png)
 
-![Export Options](docs/screenshots/export-options.png)  
-*LogNorm, HuntForge, and AtomicLoop export integrations*
+
+![Search Results](docs/screenshots/VulnForge-Search.png)  
+
 
 ---
 
