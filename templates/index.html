@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}VulnForge{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">VulnForge</h1>
+  <p class="page-subtitle">Vulnerability &amp; Exploit Intelligence | Nebula Forge</p>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Search Exploits &amp; CVEs</h2>
+  </div>
+  <div class="card-body">
+    <form method="POST" action="/search" id="searchForm">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="keyword">Keyword</label>
+          <input class="form-input" type="text" id="keyword" name="keyword"
+                 placeholder="e.g. apache 2.4, log4j, spring" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cve">CVE ID</label>
+          <input class="form-input mono" type="text" id="cve" name="cve"
+                 placeholder="e.g. CVE-2021-44228" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="exploit_type">Exploit Type</label>
+          <select class="form-select" id="exploit_type" name="exploit_type">
+            <option value="all">All Types</option>
+            <option value="rce">Remote Code Execution (RCE)</option>
+            <option value="sqli">SQL Injection (SQLi)</option>
+            <option value="xss">Cross-Site Scripting (XSS)</option>
+            <option value="lfi">Local File Inclusion (LFI)</option>
+            <option value="privesc">Privilege Escalation</option>
+            <option value="dos">Denial of Service (DoS)</option>
+            <option value="webapps">Web Application</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="platform">Platform</label>
+          <select class="form-select" id="platform" name="platform">
+            <option value="all">All Platforms</option>
+            <option value="windows">Windows</option>
+            <option value="linux">Linux</option>
+            <option value="php">PHP</option>
+            <option value="java">Java</option>
+            <option value="python">Python</option>
+            <option value="multiple">Multiple</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group mt-4">
+        <label class="form-label">Sources</label>
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="sources" value="exploitdb" checked>
+            <span class="checkmark"></span>
+            ExploitDB
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="sources" value="nvd" checked>
+            <span class="checkmark"></span>
+            NVD (NIST)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="sources" value="metasploit" checked>
+            <span class="checkmark"></span>
+            Metasploit
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="searchBtn">
+          <span class="btn-icon">&#128269;</span> Search
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<div class="info-grid">
+  <div class="info-card">
+    <div class="info-icon accent">EDB</div>
+    <div>
+      <div class="info-title">ExploitDB</div>
+      <div class="info-desc">Offensive Security's public exploit archive — the largest collection of public exploits.</div>
+    </div>
+  </div>
+  <div class="info-card">
+    <div class="info-icon success">NVD</div>
+    <div>
+      <div class="info-title">NVD / NIST</div>
+      <div class="info-desc">NIST National Vulnerability Database v2 API — authoritative CVE data with CVSS scoring.</div>
+    </div>
+  </div>
+  <div class="info-card">
+    <div class="info-icon warning">MSF</div>
+    <div>
+      <div class="info-title">Metasploit</div>
+      <div class="info-desc">Local msfconsole module search — requires Metasploit Framework installation.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('searchForm').addEventListener('submit', function() {
+    const btn = document.getElementById('searchBtn');
+    btn.innerHTML = '<span class="spinner"></span> Searching…';
+    btn.disabled = true;
+  });
+</script>
+{% endblock %}

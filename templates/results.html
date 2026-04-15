@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% block title %}Results — VulnForge{% endblock %}
+
+{% block extra_head %}
+<style>
+  .results-payload { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Search Results</h1>
+  <a href="/" class="btn btn-secondary btn-sm">&#8592; New Search</a>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if results is defined %}
+
+<!-- Summary bar -->
+<div class="summary-bar">
+  <div class="summary-stat">
+    <span class="summary-num">{{ total }}</span>
+    <span class="summary-label">Total Results</span>
+  </div>
+  {% if source_counts %}
+    {% for src, cnt in source_counts.items() %}
+    <div class="summary-stat">
+      <span class="summary-num source-{{ src | lower }}">{{ cnt }}</span>
+      <span class="summary-label">{{ src }}</span>
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Export buttons -->
+{% if results %}
+<div class="export-bar">
+  <span class="export-label">Export:</span>
+  <button class="btn btn-accent btn-sm" id="btnLognorm">
+    &#128229; LogNorm NDJSON
+  </button>
+  <button class="btn btn-success btn-sm" id="btnHuntforge">
+    &#127919; Send to HuntForge
+  </button>
+  <button class="btn btn-warning btn-sm" id="btnAtomic">
+    &#9889; Send to AtomicLoop
+  </button>
+  <span id="exportStatus" class="export-status"></span>
+</div>
+{% endif %}
+
+<!-- Results table -->
+{% if results %}
+<div class="card table-card">
+  <div class="table-wrapper">
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Date</th>
+          <th>CVSS</th>
+          <th>ATT&amp;CK</th>
+          <th>Link</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i, result in results | enumerate %}
+        {% set attck = attck_map.get(i | string, {}) %}
+        <tr>
+          <td>
+            <span class="source-badge source-{{ result.source | lower }}">
+              {{ result.source }}
+            </span>
+          </td>
+          <td class="mono id-cell">{{ result.id }}</td>
+          <td class="title-cell">{{ result.title }}</td>
+          <td class="mono date-cell">{{ result.date or '—' }}</td>
+          <td>
+            {% if result.cvss_score is not none %}
+              <span class="cvss-badge cvss-{{ result.cvss_score | cvss_class }}">
+                {{ result.cvss_score }}
+              </span>
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% set tid = attck.get('technique_id', 'UNKNOWN') %}
+            {% if tid != 'UNKNOWN' %}
+            <span class="attck-badge tactic-{{ attck.get('tactic', '') | tactic_class }}"
+                  title="{{ attck.get('tactic', '') }} | {{ attck.get('confidence', '') }} confidence">
+              {{ tid }}
+            </span>
+            <div class="attck-name">{{ attck.get('technique_name', '') }}</div>
+            {% else %}
+            <span class="muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if result.url %}
+            <a href="{{ result.url }}" class="table-link" target="_blank" rel="noopener">View &#8599;</a>
+            {% else %}
+            <span class="muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">&#128270;</div>
+  <div class="empty-title">No results found</div>
+  <div class="empty-desc">Try broadening your search terms or selecting additional sources.</div>
+  <a href="/" class="btn btn-primary mt-4">New Search</a>
+</div>
+{% endif %}
+
+{% endif %}
+
+<!-- Hidden payload for JS export actions -->
+<script id="resultsData" type="application/json">
+{{ {"results": results, "attck_map": attck_map} | tojson }}
+</script>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  const raw = document.getElementById('resultsData');
+  if (!raw) return;
+  let payload;
+  try { payload = JSON.parse(raw.textContent); } catch(e) { return; }
+
+  function setStatus(msg, cls) {
+    const el = document.getElementById('exportStatus');
+    el.textContent = msg;
+    el.className = 'export-status ' + (cls || '');
+    setTimeout(() => { el.textContent = ''; el.className = 'export-status'; }, 5000);
+  }
+
+  // LogNorm NDJSON download
+  const btnLognorm = document.getElementById('btnLognorm');
+  if (btnLognorm) {
+    btnLognorm.addEventListener('click', function() {
+      btnLognorm.disabled = true;
+      fetch('/export/lognorm', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      })
+      .then(r => {
+        if (!r.ok) throw new Error('Export failed');
+        return r.blob();
+      })
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'vulnforge_lognorm.ndjson';
+        a.click();
+        URL.revokeObjectURL(url);
+        setStatus('NDJSON downloaded.', 'status-ok');
+      })
+      .catch(e => setStatus('Export error: ' + e.message, 'status-err'))
+      .finally(() => { btnLognorm.disabled = false; });
+    });
+  }
+
+  // HuntForge
+  const btnHF = document.getElementById('btnHuntforge');
+  if (btnHF) {
+    btnHF.addEventListener('click', function() {
+      btnHF.disabled = true;
+      fetch('/export/huntforge', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(d => {
+        const warns = d.warnings && d.warnings.length ? ' — ' + d.warnings[0] : '';
+        setStatus(`HuntForge: ${d.sent} sent, ${d.failed} failed${warns}`,
+                  d.failed > 0 ? 'status-warn' : 'status-ok');
+      })
+      .catch(e => setStatus('HuntForge error: ' + e.message, 'status-err'))
+      .finally(() => { btnHF.disabled = false; });
+    });
+  }
+
+  // AtomicLoop
+  const btnAL = document.getElementById('btnAtomic');
+  if (btnAL) {
+    btnAL.addEventListener('click', function() {
+      btnAL.disabled = true;
+      fetch('/export/atomicloop', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(d => {
+        const warns = d.warnings && d.warnings.length ? ' — ' + d.warnings[0] : '';
+        setStatus(`AtomicLoop: ${d.sent} sent, ${d.failed} failed${warns}`,
+                  d.failed > 0 ? 'status-warn' : 'status-ok');
+      })
+      .catch(e => setStatus('AtomicLoop error: ' + e.message, 'status-err'))
+      .finally(() => { btnAL.disabled = false; });
+    });
+  }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}VulnForge{% endblock %} — Vulnerability & Exploit Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="app-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="/" class="sidebar-logo">
+        <div class="logo-icon">VF</div>
+        <div>
+          <div class="logo-text">VulnForge</div>
+          <div class="logo-version">Nebula Forge v2</div>
+        </div>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Search</div>
+        <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+          <span class="nav-icon">&#128269;</span> Exploit Search
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Nebula Forge Suite</div>
+        <a href="http://127.0.0.1:5000" class="nav-link external" target="_blank">
+          <span class="nav-icon">&#128279;</span> SigmaForge (5000)
+        </a>
+        <a href="http://127.0.0.1:5006" class="nav-link external" target="_blank">
+          <span class="nav-icon">&#128279;</span> LogNorm (5006)
+        </a>
+        <a href="http://127.0.0.1:5007" class="nav-link external" target="_blank">
+          <span class="nav-icon">&#128279;</span> HuntForge (5007)
+        </a>
+        <a href="http://127.0.0.1:5008" class="nav-link external" target="_blank">
+          <span class="nav-icon">&#128279;</span> DriftWatch (5008)
+        </a>
+        <a href="http://127.0.0.1:5009" class="nav-link external" target="_blank">
+          <span class="nav-icon">&#128279;</span> ClusterIQ (5009)
+        </a>
+        <a href="http://127.0.0.1:5011" class="nav-link external" target="_blank">
+          <span class="nav-icon">&#128279;</span> AtomicLoop (5011)
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-status">
+        <div class="status-dot" id="healthDot"></div>
+        <span>VulnForge API</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+
+<script>
+  // Health-check dot
+  fetch('/health')
+    .then(r => r.ok ? document.getElementById('healthDot').classList.add('online') : null)
+    .catch(() => null);
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
