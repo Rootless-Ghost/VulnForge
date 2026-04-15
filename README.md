@@ -38,6 +38,16 @@ VulnForge → HuntForge (hunt playbook) → AtomicLoop (simulation) → Wazuh (d
 - **Dark UI** — Nebula Forge dark theme, consistent with the full suite
 ---
 
+## Screenshots
+
+![Search Results](docs/screenshots/search-results.png)
+*CVE search with MITRE ATT&CK mapping and CVSS scoring*
+
+![Export Options](docs/screenshots/export-options.png)  
+*LogNorm, HuntForge, and AtomicLoop export integrations*
+
+---
+
 ## Part of Nebula Forge
  
 VulnForge is part of [Nebula Forge](https://github.com/Rootless-Ghost/Nebula-Forge) — an open-source SOC platform covering the full detection engineering workflow.
