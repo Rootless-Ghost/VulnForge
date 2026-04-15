@@ -61,53 +61,54 @@ class ExploitSearchEngine:
         logger.info("ExploitDB search: %s", url)
 
         try:
-            resp = requests.get(url, headers=_HEADERS, timeout=15)
-            resp.raise_for_status()
+            resp = requests.get(url, headers=_HEADERS, timeout=10)
+            if resp.status_code != 200:
+                logger.warning("ExploitDB returned HTTP %s — skipping", resp.status_code)
+                return []
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+            table = soup.find("table", class_="exploit_list")
+            if not table:
+                return []
+
+            results = []
+            for row in table.find("tbody").find_all("tr"):
+                cells = row.find_all("td")
+                if len(cells) < 5:
+                    continue
+                eid = cells[0].text.strip()
+                date = cells[1].text.strip()
+                title = cells[2].text.strip()
+                link_tag = cells[2].find("a")
+                eurl = (EXPLOITDB_BASE + link_tag["href"]) if link_tag else None
+                etype = cells[3].text.strip()
+                plat = cells[4].text.strip()
+
+                cve_id = None
+                cve_match = re.search(r"CVE-\d{4}-\d+", title, re.IGNORECASE)
+                if cve_match:
+                    cve_id = cve_match.group(0).upper()
+                elif cve:
+                    cve_id = cve.upper() if cve.upper().startswith("CVE-") else f"CVE-{cve.upper()}"
+
+                results.append(
+                    {
+                        "source": "ExploitDB",
+                        "id": eid,
+                        "title": title,
+                        "date": date,
+                        "url": eurl,
+                        "cvss_score": None,
+                        "cve_id": cve_id,
+                        "severity": None,
+                        "exploit_type": etype,
+                        "platform": plat,
+                        "rank": None,
+                    }
+                )
         except Exception as exc:
-            logger.warning("ExploitDB request failed: %s", exc)
+            logger.warning("ExploitDB scrape failed: %s", exc)
             return []
-
-        soup = BeautifulSoup(resp.text, "html.parser")
-        table = soup.find("table", class_="exploit_list")
-        if not table:
-            return []
-
-        results = []
-        for row in table.find("tbody").find_all("tr"):
-            cells = row.find_all("td")
-            if len(cells) < 5:
-                continue
-            eid = cells[0].text.strip()
-            date = cells[1].text.strip()
-            title = cells[2].text.strip()
-            link_tag = cells[2].find("a")
-            eurl = (EXPLOITDB_BASE + link_tag["href"]) if link_tag else None
-            etype = cells[3].text.strip()
-            plat = cells[4].text.strip()
-
-            # Try to pull CVE from title or an attribute
-            cve_id = None
-            cve_match = re.search(r"CVE-\d{4}-\d+", title, re.IGNORECASE)
-            if cve_match:
-                cve_id = cve_match.group(0).upper()
-            elif cve:
-                cve_id = cve.upper() if cve.upper().startswith("CVE-") else f"CVE-{cve.upper()}"
-
-            results.append(
-                {
-                    "source": "ExploitDB",
-                    "id": eid,
-                    "title": title,
-                    "date": date,
-                    "url": eurl,
-                    "cvss_score": None,
-                    "cve_id": cve_id,
-                    "severity": None,
-                    "exploit_type": etype,
-                    "platform": plat,
-                    "rank": None,
-                }
-            )
 
         logger.info("ExploitDB: %d results", len(results))
         return results

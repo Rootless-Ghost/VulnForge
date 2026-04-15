@@ -61,9 +61,6 @@ app.secret_key = "vulnforge-nebula-2026"
 app.jinja_env.filters["cvss_class"]   = _cvss_class
 app.jinja_env.filters["tactic_class"] = _tactic_class
 
-# Make enumerate available in templates
-app.jinja_env.globals["enumerate"] = enumerate
-
 engine = ExploitSearchEngine()
 
 

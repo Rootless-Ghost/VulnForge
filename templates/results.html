@@ -69,8 +69,8 @@
         </tr>
       </thead>
       <tbody>
-        {% for i, result in results | enumerate %}
-        {% set attck = attck_map.get(i | string, {}) %}
+        {% for result in results %}
+        {% set attck = attck_map.get(loop.index0 | string, {}) %}
         <tr>
           <td>
             <span class="source-badge source-{{ result.source | lower }}">
