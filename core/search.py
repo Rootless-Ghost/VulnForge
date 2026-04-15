@@ -54,6 +54,9 @@ class ExploitSearchEngine:
         platform: str = None,
         cve: str = None,
     ) -> list[dict]:
+        logger.info("ExploitDB scraper disabled — use CVE ID search instead")
+        return []
+
         params = []
         if keyword:
             params.append(f"search={requests.utils.quote(keyword)}")
