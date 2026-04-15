@@ -1,17 +1,38 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.6+](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/downloads/)
-
-# Automated Exploit Finder
-
-A Python tool for junior penetration testers to search for exploits across multiple vulnerability databases, including ExploitDB, National Vulnerability Database (NVD), and Metasploit Framework.
-
+# VulnForge
+ 
+**Vulnerability & Exploit Intelligence Tool | Nebula Forge Detection Suite v2**
+ 
+[![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square&logo=python)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-2.3+-lightgrey?style=flat-square&logo=flask)](https://flask.palletsprojects.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+[![Part of Nebula Forge](https://img.shields.io/badge/Nebula%20Forge-Detection%20Suite%20v2-58a6ff?style=flat-square)](https://github.com/Rootless-Ghost/Nebula-Forge)
+ 
+VulnForge aggregates exploit intelligence from ExploitDB, NVD, and Metasploit, maps findings to MITRE ATT&CK techniques, and feeds results directly into the Nebula Forge purple team pipeline — generating hunt playbooks, LogNorm-ready exports, and AtomicLoop simulation triggers from a single search.
+ 
+---
+ 
+## Overview
+ 
+VulnForge closes the gap between vulnerability discovery and detection engineering. Search for a CVE or keyword, get back exploit data mapped to ATT&CK techniques, then push that context downstream — straight into HuntForge for playbook generation or AtomicLoop for simulation.
+ 
+**Pipeline position:**
+ 
+```
+VulnForge → HuntForge (hunt playbook) → AtomicLoop (simulation) → Wazuh (detection)
+```
+ 
+---
+ 
 ## Features
-
-- Search for exploits by keywords, CVE IDs, exploit types, and platforms
-- Query multiple sources in parallel using multi-threading
-- Export results in JSON or CSV format
-- Color-coded terminal output for better readability
-- Integration with Metasploit Framework (if installed)
+ 
+- **Multi-source search** — ExploitDB, NVD (NIST API v2), and Metasploit in parallel
+- **CVE → ATT&CK mapping** — CVE/CWE → CAPEC → ATT&CK technique chaining via `mitreattack-python`
+- **LogNorm export** — ECS-lite NDJSON compatible with the LogNorm normalization pipeline
+- **HuntForge integration** — Send technique IDs directly to HuntForge for auto-generated hunt playbooks
+- **AtomicLoop trigger** — Push ATT&CK technique IDs to AtomicLoop for simulation execution
+- **CVSS scoring** — Color-coded severity (Critical / High / Medium / Low)
+- **Dark UI** — Nebula Forge dark theme, consistent with the full suite
+---
 
 ## Installation
 
