@@ -11,7 +11,10 @@ import json
 import logging
 import sys
 
+from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, send_file
+
+load_dotenv()
 
 from core.search import ExploitSearchEngine
 from core.attck_mapper import map_cve

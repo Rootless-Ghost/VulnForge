@@ -26,6 +26,13 @@ _HEADERS = {
     )
 }
 
+# NVD API key — loaded once at module import time
+_NVD_API_KEY: str | None = os.environ.get("NVD_API_KEY")
+if _NVD_API_KEY:
+    logger.info("NVD API key loaded")
+else:
+    logger.warning("NVD_API_KEY not set — rate limiting applies")
+
 # Unified result schema:
 # {
 #   source, id, title, date, url,
@@ -124,9 +131,15 @@ class ExploitSearchEngine:
 
         logger.info("NVD search params: %s", params)
 
+        # Build request headers — include API key if available, otherwise rate-limit
+        nvd_headers = dict(_HEADERS)
+        if _NVD_API_KEY:
+            nvd_headers["apiKey"] = _NVD_API_KEY
+        else:
+            time.sleep(0.6)  # NVD unauthenticated rate-limit courtesy delay
+
         try:
-            time.sleep(0.6)  # NVD rate-limit courtesy delay
-            resp = requests.get(NVD_API_URL, params=params, headers=_HEADERS, timeout=20)
+            resp = requests.get(NVD_API_URL, params=params, headers=nvd_headers, timeout=20)
             resp.raise_for_status()
             data = resp.json()
         except Exception as exc:
