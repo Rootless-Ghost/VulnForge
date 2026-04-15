@@ -111,10 +111,6 @@ Result #2 from ExploitDB
 
 This tool is intended for legitimate security testing and research purposes only. Always ensure you have proper authorization before testing for vulnerabilities on any system. Unauthorized testing may violate laws and regulations.
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## Acknowledgments
 
 - ExploitDB for maintaining a comprehensive exploit database
@@ -124,4 +120,15 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Disclaimer
 
 The authors of this tool are not responsible for any misuse or damage caused by this program. Use at your own risk.
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+
+<div align="center">
+
+Built by [Rootless-Ghost](https://github.com/Rootless-Ghost) 
+
+</div>
 
