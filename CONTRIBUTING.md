@@ -1,4 +1,4 @@
-# Contributing to Automated Exploit Finder
+# Contributing to VulnForge
 
 Thank you for considering contributing to this project! Here's how you can help.
 
@@ -29,4 +29,4 @@ Please follow PEP 8 guidelines for Python code. We recommend using flake8 to che
 pip install flake8
 
 # Run flake8 on the code
-flake8 exploit_finder.py
+flake8 .

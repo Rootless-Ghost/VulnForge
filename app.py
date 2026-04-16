@@ -9,6 +9,7 @@ Usage: python app.py
 import io
 import json
 import logging
+import os
 import sys
 
 from dotenv import load_dotenv
@@ -58,7 +59,7 @@ logger = logging.getLogger("vulnforge")
 # ── Flask app ──────────────────────────────────────────────────────────────────
 
 app = Flask(__name__)
-app.secret_key = "vulnforge-nebula-2026"
+app.secret_key = os.environ.get("SECRET_KEY", "vulnforge-dev-secret")
 
 # Register filters
 app.jinja_env.filters["cvss_class"]   = _cvss_class

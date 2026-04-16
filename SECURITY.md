@@ -2,20 +2,24 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+VulnForge follows the Nebula Forge suite versioning. Only the latest release is actively maintained with security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| v2.x    | :white_check_mark: |
+| v1.x    | :x:                |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability in VulnForge, please report it responsibly.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+**Do not open a public GitHub issue for security vulnerabilities.**
+
+Report via email to the project maintainer: open a private issue or contact [Rootless-Ghost](https://github.com/Rootless-Ghost) directly through GitHub.
+
+When reporting, include:
+- A description of the vulnerability and its potential impact
+- Steps to reproduce the issue
+- Any proof-of-concept code if applicable
+
+You can expect an acknowledgement within 48 hours and a status update within 7 days. If the vulnerability is confirmed, a patch will be released as soon as reasonably possible and you will be credited in the release notes (unless you prefer otherwise).
