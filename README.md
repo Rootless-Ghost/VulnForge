@@ -74,6 +74,31 @@ python app.py
  
 Access at `http://localhost:5012`
 
+---
+
+## Docker (Nebula Forge suite)
+
+This tool runs as a containerized service in the Nebula Forge suite.
+The recommended way to start everything together:
+
+```bash
+# From the Nebula-Forge repo root
+cp .env.example .env          # add secrets (NVD_API_KEY, ATOMICLOOP_API_KEY, etc.)
+docker compose up -d          # starts all services including vulnforge
+```
+
+**Access:** http://localhost:5012
+
+**Standalone container:**
+```bash
+docker build -t vulnforge .
+docker run -p 5012:5012 \
+  -e NVD_API_KEY=your-key-here \
+  vulnforge
+```
+
+---
+
 ## Usage
  
 ### Web UI
