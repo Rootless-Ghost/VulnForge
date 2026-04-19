@@ -234,6 +234,7 @@ def export_atomicloop_route():
 
 
 @app.get("/health")
+@app.get("/api/health")
 def health():
     return jsonify({"status": "ok", "tool": "VulnForge", "port": 5012})
 
