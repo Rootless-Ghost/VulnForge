@@ -106,9 +106,9 @@ def send_to_huntforge(result: dict, attck: dict) -> tuple[bool, str]:
         msg = "HuntForge timed out. Seed not sent."
         logger.warning(msg)
         return False, msg
-    except Exception as exc:
-        msg = f"HuntForge error: {exc}"
-        logger.warning(msg)
+    except Exception:
+        msg = "HuntForge encountered an internal error. Seed not sent."
+        logger.exception("HuntForge unexpected error while sending seed.")
         return False, msg
 
 
@@ -161,9 +161,9 @@ def send_to_atomicloop(result: dict, attck: dict) -> tuple[bool, str]:
         msg = "AtomicLoop timed out. Trigger not sent."
         logger.warning(msg)
         return False, msg
-    except Exception as exc:
-        msg = f"AtomicLoop error: {exc}"
-        logger.warning(msg)
+    except Exception:
+        msg = "AtomicLoop encountered an internal error. Trigger not sent."
+        logger.exception("AtomicLoop unexpected error while sending trigger.")
         return False, msg
 
 
