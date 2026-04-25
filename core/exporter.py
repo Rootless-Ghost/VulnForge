@@ -161,9 +161,9 @@ def send_to_atomicloop(result: dict, attck: dict) -> tuple[bool, str]:
         msg = "AtomicLoop timed out. Trigger not sent."
         logger.warning(msg)
         return False, msg
-    except Exception as exc:
-        msg = f"AtomicLoop error: {exc}"
-        logger.warning(msg)
+    except Exception:
+        msg = "AtomicLoop encountered an internal error. Trigger not sent."
+        logger.exception("AtomicLoop unexpected error while sending trigger.")
         return False, msg
 
 
