@@ -187,7 +187,7 @@ def export_lognorm_route():
         ndjson = export_lognorm(results, attck_map)
     except Exception as exc:
         logger.exception("LogNorm export error: %s", exc)
-        return jsonify({"error": str(exc)}), 500
+        return jsonify({"error": "An internal error has occurred"}), 500
 
     buf = io.BytesIO(ndjson.encode("utf-8"))
     buf.seek(0)
