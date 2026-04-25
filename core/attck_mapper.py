@@ -10,7 +10,9 @@ Never returns None — always falls back to UNKNOWN.
 """
 
 import logging
+import os
 import re
+import time
 
 import requests
 
@@ -136,8 +138,7 @@ def _from_cwes(cwes: list[str]) -> dict | None:
 def _fetch_nvd_cwes(cve_id: str) -> list[str]:
     """Fetch CWE IDs for a CVE from NVD."""
     try:
-        import time
-        time.sleep(0.6)
+        time.sleep(0.1 if os.environ.get("NVD_API_KEY") else 0.6)
         resp = requests.get(
             NVD_API_URL,
             params={"cveId": cve_id.upper()},

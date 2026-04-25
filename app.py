@@ -11,6 +11,7 @@ import json
 import logging
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, send_file
@@ -82,14 +83,13 @@ def _parse_search_form(form) -> dict:
 
 def _build_attck_map(results: list[dict]) -> dict[str, dict]:
     """Build index-keyed ATT&CK mapping for a result list."""
-    attck_map: dict[str, dict] = {}
-    for i, r in enumerate(results):
-        attck_map[str(i)] = map_cve(
-            cve_id=r.get("cve_id"),
-            title=r.get("title", ""),
-            description="",
-        )
-    return attck_map
+    def _map(args):
+        i, r = args
+        return str(i), map_cve(cve_id=r.get("cve_id"), title=r.get("title", ""), description="")
+
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        pairs = pool.map(_map, enumerate(results))
+    return dict(pairs)
 
 
 def _session_key(form) -> str:
