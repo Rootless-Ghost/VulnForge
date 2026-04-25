@@ -162,7 +162,7 @@ def api_search():
         )
     except Exception as exc:
         logger.exception("API search error: %s", exc)
-        return jsonify({"error": str(exc)}), 500
+        return jsonify({"error": "An internal error has occurred."}), 500
 
     attck_map = _build_attck_map(results)
 
