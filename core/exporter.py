@@ -106,9 +106,9 @@ def send_to_huntforge(result: dict, attck: dict) -> tuple[bool, str]:
         msg = "HuntForge timed out. Seed not sent."
         logger.warning(msg)
         return False, msg
-    except Exception as exc:
-        msg = f"HuntForge error: {exc}"
-        logger.warning(msg)
+    except Exception:
+        msg = "HuntForge encountered an internal error. Seed not sent."
+        logger.exception("HuntForge unexpected error while sending seed.")
         return False, msg
 
 
