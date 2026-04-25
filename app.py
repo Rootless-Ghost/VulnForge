@@ -69,6 +69,14 @@ app.jinja_env.filters["tactic_class"] = _tactic_class
 engine = ExploitSearchEngine()
 
 
+@app.after_request
+def _set_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    return response
+
+
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 def _parse_search_form(form) -> dict:
