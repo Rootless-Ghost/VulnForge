@@ -83,7 +83,7 @@ The recommended way to start everything together:
 
 ```bash
 # From the Nebula-Forge repo root
-cp .env.example .env          # add secrets (NVD_API_KEY, ATOMICLOOP_API_KEY, POSTGRES_PASSWORD — all required)
+cp .env.example .env          # POSTGRES_PASSWORD and ATOMICLOOP_API_KEY required; NVD_API_KEY (higher rate limits) is optional
 docker compose up -d          # starts all services including vulnforge
 ```
 
